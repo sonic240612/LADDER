@@ -2,9 +2,9 @@ const UI = {
   decreaseBtn: document.getElementById('decreaseBtn'),
   increaseBtn: document.getElementById('increaseBtn'),
   playerCountDisplay: document.getElementById('playerCountDisplay'),
-  confirmCountBtn: document.getElementById('confirmCountBtn'),
-  playerInputs: document.getElementById('playerInputs'),
-  prizeInputs: document.getElementById('prizeInputs'),
+  inputPairsContainer: document.getElementById('inputPairsContainer'),
+  topLabelsContainer: document.getElementById('topLabelsContainer'),
+  bottomLabelsContainer: document.getElementById('bottomLabelsContainer'),
   shuffleBtn: document.getElementById('shuffleBtn'),
   startBtn: document.getElementById('startBtn'),
   resetBtn: document.getElementById('resetBtn'),
@@ -13,6 +13,9 @@ const UI = {
   modalOverlay: document.getElementById('resultModal'),
   resultsList: document.getElementById('resultsList'),
   closeModalBtn: document.getElementById('closeModalBtn'),
+  confirmModal: document.getElementById('confirmModal'),
+  cancelResetBtn: document.getElementById('cancelResetBtn'),
+  confirmResetBtn: document.getElementById('confirmResetBtn'),
 };
 
 let playerCount = 4;
@@ -43,10 +46,27 @@ function init() {
 function bindEvents() {
   UI.decreaseBtn.addEventListener('click', () => updateCount(-1));
   UI.increaseBtn.addEventListener('click', () => updateCount(1));
-  UI.confirmCountBtn.addEventListener('click', setupLadder);
   UI.shuffleBtn.addEventListener('click', shuffleLadder);
   UI.startBtn.addEventListener('click', startLadderGame);
-  UI.resetBtn.addEventListener('click', resetAll);
+  
+  // Custom reset confirmation flow
+  UI.resetBtn.addEventListener('click', () => {
+    if (isPlaying) return;
+    UI.confirmModal.style.display = 'flex';
+    setTimeout(() => { UI.confirmModal.classList.add('show'); }, 10);
+  });
+  
+  UI.cancelResetBtn.addEventListener('click', () => {
+    UI.confirmModal.classList.remove('show');
+    setTimeout(() => { UI.confirmModal.style.display = 'none'; }, 300);
+  });
+  
+  UI.confirmResetBtn.addEventListener('click', () => {
+    UI.confirmModal.classList.remove('show');
+    setTimeout(() => { UI.confirmModal.style.display = 'none'; }, 300);
+    confirmReset();
+  });
+
   UI.closeModalBtn.addEventListener('click', () => {
     UI.modalOverlay.classList.remove('show');
     setTimeout(() => { UI.modalOverlay.style.display = 'none'; }, 300);
@@ -59,12 +79,13 @@ function updateCount(change) {
   if (count > 20) count = 20;
   UI.playerCountDisplay.innerText = count;
   playerCount = count;
+  setupLadder(); // 즉시 적용
 }
 
 // Preserve state of inputs
 function saveInputs() {
-  const pInputs = UI.playerInputs.querySelectorAll('.player-input');
-  const prInputs = UI.prizeInputs.querySelectorAll('.prize-input');
+  const pInputs = UI.inputPairsContainer.querySelectorAll('.player-input');
+  const prInputs = UI.inputPairsContainer.querySelectorAll('.prize-input');
   
   // Only save if there are inputs generated
   if (pInputs.length > 0) {
@@ -88,36 +109,83 @@ function setupLadder() {
   saveInputs(); // Save before recreating
   padSavedArrays();
   
-  UI.playerInputs.innerHTML = '';
-  UI.prizeInputs.innerHTML = '';
+  UI.inputPairsContainer.innerHTML = '';
+  UI.topLabelsContainer.innerHTML = '';
+  UI.bottomLabelsContainer.innerHTML = '';
   
   for (let i = 0; i < playerCount; i++) {
-    // Player Input
-    const pContainer = document.createElement('div');
-    pContainer.className = 'input-container';
+    const color = PATH_COLORS[i % PATH_COLORS.length];
+    
+    // Create Row for Input Pairs on Left Panel
+    const row = document.createElement('div');
+    row.className = 'input-pair-row';
+    
+    const indexCircle = document.createElement('div');
+    indexCircle.className = 'input-pair-index';
+    indexCircle.style.borderColor = color;
+    indexCircle.style.color = color;
+    indexCircle.innerText = i + 1;
+    
+    const inputsWrapper = document.createElement('div');
+    inputsWrapper.className = 'input-pair-inputs';
+    
     const pInput = document.createElement('input');
     pInput.type = 'text';
     pInput.className = 'player-input';
     pInput.placeholder = `참가자 ${i + 1}`;
-    pInput.value = savedPlayers[i] || ''; 
-    pContainer.appendChild(pInput);
-    UI.playerInputs.appendChild(pContainer);
+    pInput.value = savedPlayers[i] || '';
     
-    // Prize Input
-    const prContainer = document.createElement('div');
-    prContainer.className = 'input-container';
     const prInput = document.createElement('input');
     prInput.type = 'text';
     prInput.className = 'prize-input';
     prInput.placeholder = `항목 ${i + 1}`;
-    prInput.value = savedPrizes[i] || ''; 
-    prContainer.appendChild(prInput);
-    UI.prizeInputs.appendChild(prContainer);
+    prInput.value = savedPrizes[i] || '';
+    
+    pInput.tabIndex = i + 1;                    // 이름 순서: 1 ~ N
+    prInput.tabIndex = playerCount + i + 1;     // 항목 순서: N+1 ~ 2N
+
+    inputsWrapper.appendChild(pInput);
+    inputsWrapper.appendChild(prInput);
+    
+    row.appendChild(indexCircle);
+    row.appendChild(inputsWrapper);
+    
+    UI.inputPairsContainer.appendChild(row);
+    
+    // Create Top Visual Label on Right Panel
+    const topLabel = document.createElement('div');
+    topLabel.className = 'label-item';
+    topLabel.innerText = savedPlayers[i] || `참가자 ${i + 1}`;
+    topLabel.style.borderColor = color;
+    UI.topLabelsContainer.appendChild(topLabel);
+    
+    // Create Bottom Visual Label on Right Panel
+    const bottomLabel = document.createElement('div');
+    bottomLabel.className = 'label-item';
+    bottomLabel.innerText = savedPrizes[i] || `항목 ${i + 1}`;
+    bottomLabel.style.borderColor = color;
+    UI.bottomLabelsContainer.appendChild(bottomLabel);
   }
   
-  // Re-attach listeners to save state dynamically on type
-  document.querySelectorAll('.player-input, .prize-input').forEach(input => {
-    input.addEventListener('input', saveInputs);
+  // Re-attach listeners to save state and update labels dynamically on type
+  UI.inputPairsContainer.querySelectorAll('.player-input').forEach((input, index) => {
+    input.addEventListener('input', (e) => {
+      saveInputs();
+      const label = UI.topLabelsContainer.children[index];
+      if (label) {
+        label.innerText = e.target.value || `참가자 ${index + 1}`;
+      }
+    });
+  });
+  
+  UI.inputPairsContainer.querySelectorAll('.prize-input').forEach((input, index) => {
+    input.addEventListener('input', (e) => {
+      saveInputs();
+      const label = UI.bottomLabelsContainer.children[index];
+      if (label) {
+        label.innerText = e.target.value || `항목 ${index + 1}`;
+      }
+    });
   });
   
   generateLadderData();
@@ -126,7 +194,7 @@ function setupLadder() {
 
 function shuffleLadder() {
   if (isPlaying) return;
-  if (UI.playerInputs.children.length === 0) {
+  if (UI.inputPairsContainer.children.length === 0) {
     setupLadder();
   } else {
     generateLadderData();
@@ -134,18 +202,17 @@ function shuffleLadder() {
   }
 }
 
-function resetAll() {
-  if (isPlaying) return;
+function confirmReset() {
   savedPlayers = [];
   savedPrizes = [];
-  UI.playerInputs.innerHTML = '';
-  UI.prizeInputs.innerHTML = '';
+  UI.inputPairsContainer.innerHTML = '';
+  UI.topLabelsContainer.innerHTML = '';
+  UI.bottomLabelsContainer.innerHTML = '';
   setupLadder(); // this will generate empty inputs again
 }
 
 function resizeCanvas() {
   const container = UI.canvas.parentElement;
-  // Use CSS pixel resolution, handle high DPI displays nicely
   const dpr = window.devicePixelRatio || 1;
   const rect = container.getBoundingClientRect();
   
@@ -192,6 +259,22 @@ function ctxClear() {
   UI.ctx.clearRect(0, 0, rect.width, rect.height);
 }
 
+function updateLabelPositions() {
+  const { paddingX, gapX } = getDrawParams();
+  const topLabels = UI.topLabelsContainer.children;
+  const bottomLabels = UI.bottomLabelsContainer.children;
+  
+  for (let i = 0; i < playerCount; i++) {
+    const x = paddingX + i * gapX;
+    if (topLabels[i]) {
+      topLabels[i].style.left = `${x}px`;
+    }
+    if (bottomLabels[i]) {
+      bottomLabels[i].style.left = `${x}px`;
+    }
+  }
+}
+
 function drawLadder() {
   if (!ladderData.verticalLines.length) return;
   const { height, paddingX, gapX, gapY, paddingY, rows } = getDrawParams();
@@ -223,6 +306,9 @@ function drawLadder() {
     ctx.lineTo(x + gapX, y);
     ctx.stroke();
   });
+  
+  // Position labels in sync with lines
+  updateLabelPositions();
 }
 
 function tracePath(startCol) {
@@ -252,7 +338,7 @@ function tracePath(startCol) {
 }
 
 function startLadderGame() {
-  if (isPlaying || UI.playerInputs.children.length === 0) return;
+  if (isPlaying || UI.inputPairsContainer.children.length === 0) return;
   isPlaying = true;
   saveInputs();
   
@@ -269,7 +355,7 @@ function animatePaths(paths) {
   let progress = 0; 
   let currentSegment = 0;
   const maxSegments = paths[0].length - 1;
-  const speed = 0.15; // Animation speed
+  const speed = 0.45; // Animation speed
 
   function render() {
     drawLadder(); 
@@ -333,9 +419,24 @@ function animatePaths(paths) {
 function showResults(paths) {
   UI.resultsList.innerHTML = '';
   
-  const players = Array.from(UI.playerInputs.querySelectorAll('.player-input')).map((input, i) => input.value || `참가자 ${i + 1}`);
-  const prizes = Array.from(UI.prizeInputs.querySelectorAll('.prize-input')).map((input, i) => input.value || `항목 ${i + 1}`);
+  const players = Array.from(UI.inputPairsContainer.querySelectorAll('.player-input')).map((input, i) => input.value || `참가자 ${i + 1}`);
+  const prizes = Array.from(UI.inputPairsContainer.querySelectorAll('.prize-input')).map((input, i) => input.value || `항목 ${i + 1}`);
   
+  // 열 수 계산: 5명마다 1열 추가
+  const totalPlayers = paths.length;
+  const cols = Math.ceil(totalPlayers / 5);
+  const rowsInGrid = Math.min(totalPlayers, 5);
+
+  // grid-template-rows를 실제 행 수에 맞게 설정
+  UI.resultsList.style.gridTemplateRows = `repeat(${rowsInGrid}, auto)`;
+
+  // 모달 너비를 열 수에 따라 동적으로 조정
+  const modalEl = UI.modalOverlay.querySelector('.modal');
+  const baseWidth = 420;
+  const colWidth = 260;
+  modalEl.style.width = `${baseWidth + (cols - 1) * colWidth}px`;
+  modalEl.style.maxWidth = '95vw';
+
   paths.forEach((path, i) => {
     const endCol = path[path.length - 1].col;
     const player = players[i];

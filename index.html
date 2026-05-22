@@ -24,56 +24,72 @@
       </h1>
     </header>
 
-    <!-- Controls -->
-    <section class="controls">
-      <div class="control-group">
-        <label class="control-label" for="playerCount">참가 인원</label>
-        <div class="player-count-wrapper">
-          <button class="count-btn" id="decreaseBtn" aria-label="인원 감소">−</button>
-          <span class="count-display" id="playerCountDisplay">4</span>
-          <button class="count-btn" id="increaseBtn" aria-label="인원 증가">+</button>
+    <!-- Main Split Layout Container -->
+    <div class="game-layout">
+      <!-- Left Panel: Settings & Inputs -->
+      <section class="left-panel">
+        <!-- Player Count Setup Card -->
+        <div class="panel-card setup-card">
+          <h2 class="panel-card-title">👥 참가 인원 설정</h2>
+          <div class="control-group">
+            <div class="player-count-wrapper">
+              <button class="count-btn" id="decreaseBtn" aria-label="인원 감소">−</button>
+              <span class="count-display" id="playerCountDisplay">4</span>
+              <button class="count-btn" id="increaseBtn" aria-label="인원 증가">+</button>
+            </div>
+          </div>
+          <span class="count-range-info">2 ~ 20명 설정 가능</span>
         </div>
-        <button class="btn btn-confirm" id="confirmCountBtn">
-          <span class="btn-icon">✔️</span>
-          <span>확인</span>
-        </button>
-        <span class="count-range">2 ~ 20명</span>
-      </div>
 
-      <div class="control-actions">
-        <button class="btn btn-shuffle" id="shuffleBtn">
-          <span class="btn-icon">🔀</span>
-          <span>사다리 섞기</span>
-        </button>
-        <button class="btn btn-start" id="startBtn">
-          <span class="btn-icon">🚀</span>
-          <span>게임 시작</span>
-        </button>
-        <button class="btn btn-reset" id="resetBtn">
-          <span class="btn-icon">🔄</span>
-          <span>리셋</span>
-        </button>
-      </div>
-    </section>
+        <!-- Inputs Card (Participants & Prizes side by side in pairs) -->
+        <div class="panel-card inputs-card">
+          <h2 class="panel-card-title">✏️ 참가자 및 항목 입력</h2>
+          <div class="inputs-header">
+            <span class="hdr-player">참가자 이름</span>
+            <span class="hdr-prize">항목/결과</span>
+          </div>
+          <div class="input-pairs-list" id="inputPairsContainer">
+            <!-- Dynamically generated pairs of inputs -->
+          </div>
+        </div>
+      </section>
 
-    <!-- Input Area: Player Names -->
-    <section class="input-section">
-      <div class="input-row" id="playerInputs">
-        <!-- Dynamically generated -->
-      </div>
-    </section>
+      <!-- Right Panel: Ladder Board -->
+      <section class="right-panel">
+        <!-- Action Buttons Row -->
+        <div class="action-buttons-row">
+          <button class="btn btn-shuffle" id="shuffleBtn">
+            <span class="btn-icon">🔀</span>
+            <span>사다리 섞기</span>
+          </button>
+          <button class="btn btn-start" id="startBtn">
+            <span class="btn-icon">🚀</span>
+            <span>게임 시작</span>
+          </button>
+          <button class="btn btn-reset" id="resetBtn">
+            <span class="btn-icon">🔄</span>
+            <span>리셋</span>
+          </button>
+        </div>
 
-    <!-- Ladder Canvas -->
-    <div class="ladder-container">
-      <canvas id="ladderCanvas"></canvas>
+        <div class="game-board">
+          <!-- Live Top Labels (Player Names) -->
+          <div class="labels-row top-labels" id="topLabelsContainer">
+            <!-- Dynamically synced non-editable labels -->
+          </div>
+
+          <!-- Ladder Canvas Container -->
+          <div class="ladder-container">
+            <canvas id="ladderCanvas"></canvas>
+          </div>
+
+          <!-- Live Bottom Labels (Prizes) -->
+          <div class="labels-row bottom-labels" id="bottomLabelsContainer">
+            <!-- Dynamically synced non-editable labels -->
+          </div>
+        </div>
+      </section>
     </div>
-
-    <!-- Input Area: Prizes -->
-    <section class="input-section">
-      <div class="input-row" id="prizeInputs">
-        <!-- Dynamically generated -->
-      </div>
-    </section>
 
     <!-- Results Modal -->
     <div class="modal-overlay" id="resultModal">
@@ -81,6 +97,23 @@
         <h2 class="modal-title">🎉 결과 발표!</h2>
         <div class="results-list" id="resultsList"></div>
         <button class="btn btn-close-modal" id="closeModalBtn">확인</button>
+      </div>
+    </div>
+
+    <!-- Reset Confirmation Modal -->
+    <div class="modal-overlay" id="confirmModal">
+      <div class="modal confirm-modal">
+        <div class="confirm-header">
+          <span class="confirm-warning-icon">⚠️</span>
+          <h2 class="confirm-title">정말 리셋하시겠습니까?</h2>
+        </div>
+        <p class="confirm-message">
+          작성 중인 모든 참가자 이름과 항목이 완전히 삭제되고 기본 상태로 복구됩니다.
+        </p>
+        <div class="confirm-actions">
+          <button class="btn btn-cancel" id="cancelResetBtn">취소</button>
+          <button class="btn btn-confirm-danger" id="confirmResetBtn">초기화</button>
+        </div>
       </div>
     </div>
   </div>
