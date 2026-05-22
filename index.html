@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="사다리 타기 룰렛 - 2~20명이 참여할 수 있는 인터랙티브 사다리 게임">
+  <title>🪜 사다리 타기 룰렛</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <!-- Background Effects -->
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+    <div class="bg-glow bg-glow-3"></div>
+
+    <!-- Header -->
+    <header class="header">
+      <h1 class="title">
+        <span class="title-icon">🪜</span>
+        <span class="title-text">사다리 타기</span>
+        <span class="title-badge">ROULETTE</span>
+      </h1>
+    </header>
+
+    <!-- Controls -->
+    <section class="controls">
+      <div class="control-group">
+        <label class="control-label" for="playerCount">참가 인원</label>
+        <div class="player-count-wrapper">
+          <button class="count-btn" id="decreaseBtn" aria-label="인원 감소">−</button>
+          <span class="count-display" id="playerCountDisplay">4</span>
+          <button class="count-btn" id="increaseBtn" aria-label="인원 증가">+</button>
+        </div>
+        <button class="btn btn-confirm" id="confirmCountBtn">
+          <span class="btn-icon">✔️</span>
+          <span>확인</span>
+        </button>
+        <span class="count-range">2 ~ 20명</span>
+      </div>
+
+      <div class="control-actions">
+        <button class="btn btn-shuffle" id="shuffleBtn">
+          <span class="btn-icon">🔀</span>
+          <span>사다리 섞기</span>
+        </button>
+        <button class="btn btn-start" id="startBtn">
+          <span class="btn-icon">🚀</span>
+          <span>게임 시작</span>
+        </button>
+        <button class="btn btn-reset" id="resetBtn">
+          <span class="btn-icon">🔄</span>
+          <span>리셋</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Input Area: Player Names -->
+    <section class="input-section">
+      <div class="input-row" id="playerInputs">
+        <!-- Dynamically generated -->
+      </div>
+    </section>
+
+    <!-- Ladder Canvas -->
+    <div class="ladder-container">
+      <canvas id="ladderCanvas"></canvas>
+    </div>
+
+    <!-- Input Area: Prizes -->
+    <section class="input-section">
+      <div class="input-row" id="prizeInputs">
+        <!-- Dynamically generated -->
+      </div>
+    </section>
+
+    <!-- Results Modal -->
+    <div class="modal-overlay" id="resultModal">
+      <div class="modal">
+        <h2 class="modal-title">🎉 결과 발표!</h2>
+        <div class="results-list" id="resultsList"></div>
+        <button class="btn btn-close-modal" id="closeModalBtn">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
