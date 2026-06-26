@@ -4,6 +4,9 @@
 
 ![사다리 타기](https://img.shields.io/badge/version-1.0.0-blue)
 ![GitHub](https://img.shields.io/badge/license-MIT-green)
+[![Vercel](https://img.shields.io/badge/deployed_on-Vercel-black?logo=vercel)](https://ladder-roulette.vercel.app)
+
+**🔗 바로가기**: [https://ladder-roulette.vercel.app](https://ladder-roulette.vercel.app)
 
 ---
 
@@ -53,30 +56,6 @@ LADDER/
 └── README.md     # 프로젝트 설명
 ```
 
----
-
-## 🚀 실행 방법
-
-이 프로젝트는 정적 웹 애플리케이션이므로 별도의 빌드 없이 바로 실행할 수 있습니다.
-
-### 방법 1 — 브라우저에서 직접 열기
-
-```
-open index.html
-```
-
-### 방법 2 — 로컬 HTTP 서버 사용 (권장)
-
-```bash
-# Python
-python3 -m http.server 8080
-# http://localhost:8080
-
-# Node.js (npx)
-npx serve .
-```
-
----
 
 ## ⚙️ 동작 방식
 
